@@ -10,6 +10,7 @@ class Config:
     MAX_WORKERS = int(os.getenv("MAX_WORKERS", "4"))
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
     SECRET_KEY = os.getenv("SECRET_KEY", "")
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
 
     @classmethod
     def from_env(cls):
