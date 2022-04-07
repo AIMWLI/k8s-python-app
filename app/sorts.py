@@ -104,3 +104,41 @@ def merge(arr, left, mid, right):
         arr[k] = right_part[j]
         j += 1
         k += 1
+
+
+def dual_pivot_quicksort(arr):
+    n = len(arr)
+    if n < 2:
+        return arr
+    return _dual_pivot(arr, 0, n - 1)
+
+
+def _dual_pivot(arr, low, high):
+    if low < high:
+        if arr[low] > arr[high]:
+            arr[low], arr[high] = arr[high], arr[low]
+        p, q = arr[low], arr[high]
+        i = low + 1
+        k = low + 1
+        g = high - 1
+        while k <= g:
+            if arr[k] < p:
+                arr[k], arr[i] = arr[i], arr[k]
+                i += 1
+            elif arr[k] > q:
+                while arr[g] > q and k < g:
+                    g -= 1
+                arr[k], arr[g] = arr[g], arr[k]
+                g -= 1
+                if arr[k] < p:
+                    arr[k], arr[i] = arr[i], arr[k]
+                    i += 1
+            k += 1
+        i -= 1
+        g += 1
+        arr[low], arr[i] = arr[i], arr[low]
+        arr[high], arr[g] = arr[g], arr[high]
+        _dual_pivot(arr, low, i - 1)
+        _dual_pivot(arr, i + 1, g - 1)
+        _dual_pivot(arr, g + 1, high)
+    return arr
