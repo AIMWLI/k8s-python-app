@@ -1,0 +1,19 @@
+[project]
+name = "k8s-python-app"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=2.2",
+    "httpx[http2,brotli]>=0.23",
+    "gunicorn>=20.1",
+    "orjson>=3.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.1",
+    "pytest-asyncio>=0.20",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
