@@ -1,5 +1,5 @@
 import pytest
-from app.sorts import quicksort, mergesort, heapsort
+from app.sorts import quicksort, mergesort, heapsort, timsort, dual_pivot_quicksort
 
 
 cases = [
@@ -13,7 +13,7 @@ cases = [
 ]
 
 
-@pytest.mark.parametrize("sort_fn", [quicksort, mergesort, heapsort])
+@pytest.mark.parametrize("sort_fn", [quicksort, mergesort, heapsort, timsort, dual_pivot_quicksort])
 def test_sorts(sort_fn):
     for inp, expected in cases:
         assert sort_fn(inp[:]) == expected
