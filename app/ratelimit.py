@@ -18,3 +18,11 @@ class SlidingWindowLimiter:
             return False
         timestamps.append(now)
         return True
+
+    def remaining(self, key):
+        now = time.time()
+        window_start = now - self.window
+        timestamps = self._requests[key]
+        while timestamps and timestamps[0] < window_start:
+            timestamps.pop(0)
+        return max(0, self.max_requests - len(timestamps))
