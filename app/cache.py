@@ -20,3 +20,6 @@ class TTLCache:
 
     def clear(self):
         self._store.clear()
+
+    def delete(self, key):
+        self._store.pop(key, None)
