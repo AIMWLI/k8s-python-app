@@ -11,3 +11,7 @@ def validate_port(port):
 
 def validate_nonempty(s):
     return isinstance(s, str) and len(s.strip()) > 0
+
+
+def validate_url(url):
+    return re.match(r'^https?://[^\s/$.?#].[^\s]*$', url) is not None
