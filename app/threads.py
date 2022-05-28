@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+
 _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="worker")
 
 
@@ -13,6 +14,11 @@ def run_tasks(tasks):
         except Exception as e:
             results[name] = str(e)
     return results
+
+
+def map_results(fn, items):
+    futures = [_executor.submit(fn, item) for item in items]
+    return [f.result() for f in as_completed(futures)]
 
 
 def shutdown():
