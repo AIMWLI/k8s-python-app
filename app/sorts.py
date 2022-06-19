@@ -50,3 +50,55 @@ def heapsort(arr):
         arr[i], arr[0] = arr[0], arr[i]
         heapify(arr, i, 0)
     return arr
+
+
+def insertion_sort(arr, left, right):
+    for i in range(left + 1, right + 1):
+        key = arr[i]
+        j = i - 1
+        while j >= left and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+
+
+MIN_MERGE = 32
+
+
+def timsort(arr):
+    n = len(arr)
+    for start in range(0, n, MIN_MERGE):
+        end = min(start + MIN_MERGE - 1, n - 1)
+        insertion_sort(arr, start, end)
+    size = MIN_MERGE
+    while size < n:
+        for left in range(0, n, size * 2):
+            mid = left + size - 1
+            right = min(left + size * 2 - 1, n - 1)
+            if mid < right:
+                merge(arr, left, mid, right)
+        size *= 2
+    return arr
+
+
+def merge(arr, left, mid, right):
+    left_part = arr[left:mid + 1]
+    right_part = arr[mid + 1:right + 1]
+    i = j = 0
+    k = left
+    while i < len(left_part) and j < len(right_part):
+        if left_part[i] <= right_part[j]:
+            arr[k] = left_part[i]
+            i += 1
+        else:
+            arr[k] = right_part[j]
+            j += 1
+        k += 1
+    while i < len(left_part):
+        arr[k] = left_part[i]
+        i += 1
+        k += 1
+    while j < len(right_part):
+        arr[k] = right_part[j]
+        j += 1
+        k += 1
