@@ -23,5 +23,10 @@ def echo():
     return jsonify({"echo": data})
 
 
+@app.route("/config")
+def get_config():
+    return jsonify({"debug": cfg.DEBUG, "host": cfg.HOST, "port": cfg.PORT})
+
+
 if __name__ == "__main__":
     app.run(host=cfg.HOST, port=cfg.PORT)
