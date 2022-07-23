@@ -10,3 +10,8 @@ def preload_cache(cache, data_path):
         data = json.load(f)
     for key, value in data.items():
         cache.set(key, value)
+
+
+def preload_from_dict(cache, data):
+    for key, value in data.items():
+        cache.set(key, value)
