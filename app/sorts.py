@@ -67,6 +67,8 @@ MIN_MERGE = 32
 
 def timsort(arr):
     n = len(arr)
+    if n < 2:
+        return arr
     for start in range(0, n, MIN_MERGE):
         end = min(start + MIN_MERGE - 1, n - 1)
         insertion_sort(arr, start, end)
