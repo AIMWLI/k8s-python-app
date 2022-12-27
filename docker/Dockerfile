@@ -1,9 +1,11 @@
-FROM python:3.7.12-alpine3.15
+FROM python:3.11-slim
 
-RUN mkdir /app
 WORKDIR /app
-ADD . /app/
-RUN pip install -r requirements.txt
+
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 EXPOSE 5000
-CMD ["python", "/app/main.py"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "wsgi:app"]
