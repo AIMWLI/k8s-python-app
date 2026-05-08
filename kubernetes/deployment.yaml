@@ -1,32 +1,47 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: hello-python-service
-spec:
-  selector:
-    app: hello-python
-  ports:
-  - protocol: "TCP"
-    port: 6000
-    targetPort: 5000
-  type: LoadBalancer
-
-
----
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-python
+  name: python-app
+  labels:
+    app: python-app
 spec:
-  replicas: 4
+  replicas: 3
+  selector:
+    matchLabels:
+      app: python-app
   template:
     metadata:
       labels:
-        app: hello-python
+        app: python-app
     spec:
       containers:
-      - name: hello-python
-        image: hello-python:latest
-        imagePullPolicy: Never
+      - name: app
+        image: python-app:latest
         ports:
-        - containerPort: 5000
+        - containerPort: 8000
+        env:
+        - name: DEBUG
+          value: "false"
+        - name: PORT
+          value: "8000"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          timeoutSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"

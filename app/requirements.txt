@@ -1,1 +1,7 @@
-Flask
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+gunicorn>=22.0
+httpx[http2,brotli]>=0.27.0
+orjson>=3.10.0
