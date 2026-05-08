@@ -21,9 +21,23 @@ spec:
         - containerPort: 8000
         env:
         - name: DEBUG
-          value: "true"
+          value: "false"
         - name: PORT
           value: "8000"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          timeoutSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
         resources:
           requests:
             memory: "128Mi"
