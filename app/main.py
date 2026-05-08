@@ -1,32 +1,50 @@
-from flask import Flask, jsonify, request
-from app.config import Config
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Request
+from pydantic import BaseModel, ConfigDict
+
+from app.config import settings
 from app.cache import TTLCache
 
-app = Flask(__name__)
-cfg = Config()
 cache = TTLCache(ttl=30)
 
 
-@app.route("/")
-def hello():
-    return "Hello from Python!"
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    yield
 
 
-@app.route("/health")
+app = FastAPI(title="k8s-python-app", lifespan=lifespan)
+
+
+@app.get("/")
+def root():
+    return {"message": "Hello from Python!"}
+
+
+@app.get("/health")
 def health():
-    return jsonify({"status": "ok", "host": cfg.HOST, "port": cfg.PORT})
+    return {
+        "status": "ok",
+        "host": settings.HOST,
+        "port": settings.PORT,
+    }
 
 
-@app.route("/echo", methods=["POST"])
-def echo():
-    data = request.get_json(force=True)
-    return jsonify({"echo": data})
-
-
-@app.route("/config")
+@app.get("/config")
 def get_config():
-    return jsonify({"debug": cfg.DEBUG, "host": cfg.HOST, "port": cfg.PORT})
+    return {
+        "debug": settings.DEBUG,
+        "host": settings.HOST,
+        "port": settings.PORT,
+        "log_level": settings.LOG_LEVEL,
+    }
 
 
-if __name__ == "__main__":
-    app.run(host=cfg.HOST, port=cfg.PORT)
+class EchoBody(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+
+@app.post("/echo")
+def echo(body: EchoBody) -> dict:
+    return {"echo": body.model_dump()}

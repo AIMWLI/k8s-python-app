@@ -5,7 +5,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     ports:
-      - "5000:5000"
+      - "8000:8000"
     environment:
       - DEBUG=true
       - REDIS_URL=redis://redis:6379/0

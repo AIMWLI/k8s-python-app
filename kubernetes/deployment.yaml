@@ -18,12 +18,12 @@ spec:
       - name: app
         image: python-app:latest
         ports:
-        - containerPort: 5000
+        - containerPort: 8000
         env:
         - name: DEBUG
           value: "true"
         - name: PORT
-          value: "5000"
+          value: "8000"
         resources:
           requests:
             memory: "128Mi"
