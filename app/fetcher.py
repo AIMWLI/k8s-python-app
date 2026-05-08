@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
+import orjson
 from httpx import HTTPStatusError, TimeoutException
 
 from app.logger import get_logger
@@ -27,7 +28,7 @@ class AsyncFetcher:
             try:
                 r = await client.get(url)
                 r.raise_for_status()
-                return r.json()
+                return orjson.loads(r.content)
             except (TimeoutException, HTTPStatusError) as exc:
                 if attempt == self.max_retries - 1:
                     _log.error(

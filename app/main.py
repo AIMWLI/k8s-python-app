@@ -4,8 +4,9 @@ from __future__ import annotations
 import contextvars
 import time
 import uuid
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any
 
 import httpx
 from fastapi import FastAPI, Request
@@ -34,7 +35,7 @@ def get_http_client() -> httpx.AsyncClient:
 
 
 @asynccontextmanager
-async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
     global _http_client
     _http_client = httpx.AsyncClient(
         http2=True,
