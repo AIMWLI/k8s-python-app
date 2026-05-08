@@ -1,9 +1,14 @@
+"""全局配置 — pydantic-settings 环境变量注入，模块级单例。"""
+from __future__ import annotations
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
-    
+class _Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
     DEBUG: bool = False
     HOST: str = "0.0.0.0"
     PORT: int = 8000
@@ -14,5 +19,5 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "*"
 
 
-# Module-level singleton
-settings = Settings()
+# 模块级单例 — Import System 保证零锁、O(1) 线程安全
+settings: _Settings = _Settings()

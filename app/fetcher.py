@@ -1,49 +1,50 @@
-from typing import Optional, Any, List
+"""异步 HTTP 抓取器 — 复用全局连接池，带重试与结构化错误日志。"""
+from __future__ import annotations
+
 import asyncio
+from typing import Any
+
 from httpx import HTTPStatusError, TimeoutException
 
-from app.main import http_client
+from app.logger import get_logger
+from app.main import get_http_client
+
+_log = get_logger(__name__)
 
 
 class AsyncFetcher:
-    """
-    Zero-state, module-level usage fetcher wrapper.
-    Re-uses the global http_client with http2=True and brotli.
-    """
+    """零状态抓取器，复用全局 httpx.AsyncClient 连接池。"""
     __slots__ = ("base_url", "max_retries")
 
-    def __init__(self, base_url: str, max_retries: int = 2):
+    def __init__(self, base_url: str, max_retries: int = 2) -> None:
         self.base_url = base_url
         self.max_retries = max_retries
 
-    async def get(self, path: str) -> Optional[Any]:
+    async def get(self, path: str) -> Any | None:
         url = f"{self.base_url}{path}"
-        # Retry loop without time.sleep, using pure async flow
+        client = get_http_client()
         for attempt in range(self.max_retries):
             try:
-                r = await http_client.get(url)
+                r = await client.get(url)
                 r.raise_for_status()
-                # Use httpx built-in orjson integration (or .json() which is optimized internally)
-                # For pure orjson, we could do: orjson.loads(r.read())
                 return r.json()
-            except (TimeoutException, HTTPStatusError) as e:
-                # Need to log instead of swallowing silently, per constraints.
-                # Here we just print, but production code should use structlog
+            except (TimeoutException, HTTPStatusError) as exc:
                 if attempt == self.max_retries - 1:
-                    print(f"fetch error {url}: {e.__class__.__name__}")
-                continue
+                    _log.error(
+                        "fetch failed url=%s attempt=%d/%d error=%s",
+                        url, attempt + 1, self.max_retries, exc,
+                    )
         return None
 
-    # No manual close() needed, lifespan handles global http_client.aclose()
 
-
-async def fetch_all(urls: List[str], max_concurrent: int = 10) -> List[Any]:
+async def fetch_all(urls: list[str], max_concurrent: int = 10) -> list[Any]:
+    """并发批量抓取，Semaphore 控制最大并发数。"""
     sem = asyncio.Semaphore(max_concurrent)
+    client = get_http_client()
 
     async def _fetch(url: str) -> Any:
         async with sem:
-            r = await http_client.get(url)
+            r = await client.get(url)
             return r.text
 
-    # Uses generator expression rather than list comprehension inside gather
     return await asyncio.gather(*(_fetch(u) for u in urls), return_exceptions=True)

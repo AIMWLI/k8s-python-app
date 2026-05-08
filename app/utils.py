@@ -1,24 +1,17 @@
-from typing import TypeVar, Iterable, List, Generator
-from pathlib import Path
-import orjson
+"""通用工具函数 — 极简、高内聚、O(1) 约束。"""
+from __future__ import annotations
+
+from typing import Generator, Iterable, TypeVar
 
 T = TypeVar("T")
 
-def load_config(path: str = "config.json") -> dict:
-    p = Path(path)
-    if not p.exists():
-        return {}
-    return orjson.loads(p.read_bytes())
 
-def merge_dict(a: dict, b: dict) -> dict:
-    r = a.copy()
-    r.update(b)
-    return r
-
-def chunks(lst: List[T], n: int) -> Generator[List[T], None, None]:
+def chunks(lst: list[T], n: int) -> Generator[list[T], None, None]:
+    """将列表按固定大小分块，生成器惰性输出。"""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def unique_preserve_order(seq: Iterable[T]) -> List[T]:
-    # Constraint: 去重查询强制用 set/dict. O(1) dictated dict.fromkeys which maintains order.
+
+def unique_preserve_order(seq: Iterable[T]) -> list[T]:
+    """去重并保持原始顺序 — dict.fromkeys 保证 O(1) 查找。"""
     return list(dict.fromkeys(seq))
